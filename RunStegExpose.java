@@ -59,10 +59,12 @@ public class RunStegExpose {
 	public static void main(String[] args){
 		
 		//obtaining all files to be steganalysed
-		File[] listOfFiles;
+		//File[] listOfFiles;
+                File file;
 		if(args.length>0){
-			File folder = new File(args[0]);
-			listOfFiles = folder.listFiles();
+			//File folder = new File(args[0]);
+			//listOfFiles = folder.listFiles();
+                        file = new File(args[0]);
 		}
 		else{
 			System.out.println("please provide StegExpose with directory of files to be scanned");
@@ -103,7 +105,7 @@ public class RunStegExpose {
 		}
 
 		//iterating through all files in a given directory
-		for (File file : listOfFiles) {
+		//for (File file : listOfFiles) {
 		    //reset all detectors
 			ps = null;
 			cs = null;
@@ -116,77 +118,77 @@ public class RunStegExpose {
 		    	
 		    	//routine (currently only for images)
 		        if(image != null){
-		        	fileSize = file.length();
-		        	fileName=file.getName();
-		        	
-					stegExposeInput = new ArrayList<Double>();
-		        	
-		        	//computing primary set
-					try{
-						PrimarySets pso = new PrimarySets(image);
-						pso.run();
-						ps = steralize(pso.getResult());
-						add(ps);
-					}
-					catch(Exception e){
-					}
-					
-					
-					//looking for fast break
-					if(isClean())
-						continue;
-					
-					
-					//computing Sample Pairs average
-					try{
-						SamplePairs spo = new SamplePairs();
-						sp = steralize((spo.doAnalysis(image, RED) + spo.doAnalysis(image, GREEN) + spo.doAnalysis(image, BLUE))/3);
-						add(sp);
-					}
-					catch(Exception e){
-					}
-					
-					//looking for fast break
-					if(isClean())
-						continue;
-					
-					//computing chi square attack
-					try{
-						int nbBlocks = ((3*image.getWidth()*image.getHeight())/csSize) - 1;
-						double[] x = new double[nbBlocks];
-						double[] chi = new double[nbBlocks];
-						ChiSquare.chiSquareAttackTopToBottom(image, x, chi, csSize);
-						double csQuant = 0;
-						for(double csVal : chi)
-							csQuant += csVal;
-						cs = steralize(csQuant/chi.length);
-						add(cs);
-					}
-					catch(Exception e){
-						
-					}
-					
-					//looking for fast break
-					if(isClean())
-						continue;
-					
-					//computing RS Analysis average
-					try{
-						RSAnalysis rso = new RSAnalysis(2,2);
-						//RS analysis for overlapping groups
-						double rsAverageOverlappingVal = (rso.doAnalysis(image, RED, true)[26] + rso.doAnalysis(image, GREEN, true)[26] + rso.doAnalysis(image, BLUE, true)[26])/3;
-						//RS analysis for non-overlapping groups
-						double rsAverageNonOverlappingVal = (rso.doAnalysis(image, RED, false)[26] + rso.doAnalysis(image, GREEN, false)[26] + rso.doAnalysis(image, BLUE, false)[26])/3;
-						
-						rs = steralize((rsAverageOverlappingVal+rsAverageNonOverlappingVal)/2);
-						add(rs);
-					}
-					catch(Exception e){
-					}
-					printResults();
-				}
+                            fileSize = file.length();
+                            fileName=file.getName();
+
+                            stegExposeInput = new ArrayList<Double>();
+
+                            //computing primary set
+                            try{
+                                PrimarySets pso = new PrimarySets(image);
+                                pso.run();
+                                ps = steralize(pso.getResult());
+                                add(ps);
+                            }
+                            catch(Exception e){
+                            }
+
+
+                            //looking for fast break
+                            /*if(isClean())
+                                continue;*/
+
+
+                            //computing Sample Pairs average
+                            try{
+                                SamplePairs spo = new SamplePairs();
+                                sp = steralize((spo.doAnalysis(image, RED) + spo.doAnalysis(image, GREEN) + spo.doAnalysis(image, BLUE))/3);
+                                add(sp);
+                            }
+                            catch(Exception e){
+                            }
+
+                            //looking for fast break
+                            /*if(isClean())
+                                continue;*/
+
+                            //computing chi square attack
+                            try{
+                                int nbBlocks = ((3*image.getWidth()*image.getHeight())/csSize) - 1;
+                                double[] x = new double[nbBlocks];
+                                double[] chi = new double[nbBlocks];
+                                ChiSquare.chiSquareAttackTopToBottom(image, x, chi, csSize);
+                                double csQuant = 0;
+                                for(double csVal : chi)
+                                        csQuant += csVal;
+                                cs = steralize(csQuant/chi.length);
+                                add(cs);
+                            }
+                            catch(Exception e){
+
+                            }
+
+                            //looking for fast break
+                            /*if(isClean())
+                                continue;*/
+
+                            //computing RS Analysis average
+                            try{
+                                RSAnalysis rso = new RSAnalysis(2,2);
+                                //RS analysis for overlapping groups
+                                double rsAverageOverlappingVal = (rso.doAnalysis(image, RED, true)[26] + rso.doAnalysis(image, GREEN, true)[26] + rso.doAnalysis(image, BLUE, true)[26])/3;
+                                //RS analysis for non-overlapping groups
+                                double rsAverageNonOverlappingVal = (rso.doAnalysis(image, RED, false)[26] + rso.doAnalysis(image, GREEN, false)[26] + rso.doAnalysis(image, BLUE, false)[26])/3;
+
+                                rs = steralize((rsAverageOverlappingVal+rsAverageNonOverlappingVal)/2);
+                                add(rs);
+                            }
+                            catch(Exception e){
+                            }
+                            printResults();
+                        }
 	        }
-		}
+		//} // remove
 		if(csvMode)
 			writer.close();
 	}
